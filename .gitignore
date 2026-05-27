@@ -1,0 +1,39 @@
+# Flutter / Dart
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+/build/
+
+# Android build artifacts
+/android/app/debug/
+/android/app/profile/
+/android/app/release/
+/android/.gradle/
+/android/captures/
+**/GeneratedPluginRegistrant.java
+
+# IntelliJ / Android Studio
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# Keys / secrets — nunca subir
+*.jks
+*.keystore
+**/google-services.json
+**/GoogleService-Info.plist

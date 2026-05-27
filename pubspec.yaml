@@ -1,0 +1,32 @@
+name: caminside
+description: "CamInside — App de demostración para 'Cámara Android: Bajo el Capó'"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.11.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+
+  # Cámara
+  camera: ^0.10.9
+
+  # WebSocket (Socket.io)
+  socket_io_client: ^2.0.3+1
+
+  # ML Kit — escaneo de códigos QR y barras
+  google_mlkit_barcode_scanning: ^0.13.0
+
+  # Permisos en runtime
+  permission_handler: ^11.3.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
