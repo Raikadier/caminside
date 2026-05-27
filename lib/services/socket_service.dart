@@ -1,4 +1,4 @@
-import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:socket_io_client/socket_io_client.dart' as io;
 
 /// Singleton que gestiona la conexión WebSocket con el servidor Node.js.
 ///
@@ -11,7 +11,7 @@ class SocketService {
   factory SocketService() => _instance;
   SocketService._internal();
 
-  IO.Socket? _socket;
+  io.Socket? _socket;
   String _serverUrl = 'http://192.168.1.1:3000';
   bool _connected = false;
 
@@ -32,7 +32,9 @@ class SocketService {
 
   void _notify(bool state) {
     _connected = state;
-    for (final fn in List.of(_connListeners)) fn(state);
+    for (final fn in List.of(_connListeners)) {
+      fn(state);
+    }
   }
 
   // ── Conectar ───────────────────────────────────────────────────────────
@@ -40,9 +42,9 @@ class SocketService {
     _serverUrl = url;
     _socket?.disconnect();
 
-    _socket = IO.io(
+    _socket = io.io(
       url,
-      IO.OptionBuilder()
+      io.OptionBuilder()
           .setTransports(['websocket'])
           .disableAutoConnect()
           .setReconnectionDelay(1500)
@@ -107,13 +109,13 @@ class SocketService {
   }) {
     emit('hal_info', {
       'capa': capa,
-      if (focalLength != null)      'focal_length':      focalLength,
-      if (aperture != null)         'aperture':          aperture,
-      if (nivelSoporte != null)     'nivel_soporte':     nivelSoporte,
-      if (sensorOrientation != null)'sensor_orientation':sensorOrientation,
-      if (cameraCount != null)      'camera_count':      cameraCount,
-      if (lensDirection != null)    'lens_direction':    lensDirection,
-      if (previewSize != null)      'preview_size':      previewSize,
+      'focal_length':      ?focalLength,
+      'aperture':          ?aperture,
+      'nivel_soporte':     ?nivelSoporte,
+      'sensor_orientation':?sensorOrientation,
+      'camera_count':      ?cameraCount,
+      'lens_direction':    ?lensDirection,
+      'preview_size':      ?previewSize,
     });
   }
 
@@ -144,7 +146,7 @@ class SocketService {
       'valor':     valor,
       'formato':   formato,
       'confianza': confianza ?? 0.95,
-      if (coordenadas != null) 'coordenadas': coordenadas,
+      'coordenadas': ?coordenadas,
     });
   }
 

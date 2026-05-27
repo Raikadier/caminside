@@ -297,9 +297,9 @@ class _StatsRow extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _Stat('-${codeSaving}%', 'menos código'),
+          _Stat('-$codeSaving%', 'menos código'),
           Container(width: 1, height: 30, color: kBorder),
-          _Stat('-${timeSaving}%', 'tiempo init'),
+          _Stat('-$timeSaving%', 'tiempo init'),
           Container(width: 1, height: 30, color: kBorder),
           _Stat('×1', 'línea flutter'),
         ],

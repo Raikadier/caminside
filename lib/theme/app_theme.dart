@@ -68,7 +68,7 @@ ThemeData buildTheme() {
       unselectedLabelStyle: TextStyle(fontSize: 9),
     ),
 
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       color: kBgCard,
       elevation: 0,
       shape: RoundedRectangleBorder(
@@ -135,7 +135,7 @@ ThemeData buildTheme() {
     ),
 
     dividerTheme: const DividerThemeData(color: kBorder, thickness: 1),
-    dialogTheme: DialogTheme(
+    dialogTheme: DialogThemeData(
       backgroundColor: kBgCard,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),

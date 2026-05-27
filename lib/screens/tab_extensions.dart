@@ -18,11 +18,21 @@ class _TabExtensionsState extends State<TabExtensions> {
   String? _selectedMode; // 'old' | 'new' | 'night' | 'hdr' | 'bokeh'
 
   static const _extensions = [
-    _Ext('night',  '🌙', 'NIGHT',  kBlue,   'Fusión multi-frame · ISP nativo'),
-    _Ext('hdr',    '☀️',  'HDR',    kYellow, 'High Dynamic Range · tone mapping'),
-    _Ext('bokeh',  '🎯', 'BOKEH',  kPurple, 'Desenfoque portátil · depth map'),
-    _Ext('beauty', '✨', 'BEAUTY', kGreen,  'Retoque facial · edge detection'),
-    _Ext('auto',   '🔮', 'AUTO',   kCyan,   'HAL selecciona automáticamente'),
+    _Ext('night',  '🌙', 'NIGHT',  kBlue,   'Fusión multi-frame · ISP nativo',
+         'Captura múltiples frames a distinta exposición\ny los fusiona en el ISP del fabricante.',
+         ['Multi-frame NR', 'Long exposure stacking', 'Tone mapping HDR']),
+    _Ext('hdr',    '☀️',  'HDR',    kYellow, 'High Dynamic Range · tone mapping',
+         'Preserva luces y sombras en escenas\ncon alto contraste mediante tone mapping.',
+         ['Dual-ISO capture', 'Highlight recovery', 'Shadow boost']),
+    _Ext('bokeh',  '🎯', 'BOKEH',  kPurple, 'Desenfoque portátil · depth map',
+         'Genera un depth map con la cámara\ny desenfoca el fondo en hardware.',
+         ['Depth estimation', 'Segmentation mask', 'Lens blur nativo']),
+    _Ext('beauty', '✨', 'BEAUTY', kGreen,  'Retoque facial · edge detection',
+         'Detecta rostros con el ISP y aplica\nsuavizado de piel en tiempo real.',
+         ['Face detection ISP', 'Skin smoothing', 'Edge-aware filter']),
+    _Ext('auto',   '🔮', 'AUTO',   kCyan,   'HAL selecciona automáticamente',
+         'El HAL del fabricante elige la extensión\nóptima según la escena detectada.',
+         ['Scene classification', 'Auto mode selection', 'Manufacturer algorithm']),
   ];
 
   @override
@@ -134,7 +144,7 @@ class _TabExtensionsState extends State<TabExtensions> {
                   child: ListView.separated(
                     scrollDirection: Axis.horizontal,
                     itemCount: _extensions.length,
-                    separatorBuilder: (_, __) => const SizedBox(width: 6),
+                    separatorBuilder: (_, _) => const SizedBox(width: 6),
                     itemBuilder: (_, i) {
                       final e = _extensions[i];
                       final sel = _selectedMode == e.id;
@@ -180,6 +190,17 @@ class _TabExtensionsState extends State<TabExtensions> {
                 ),
                 const SizedBox(height: 10),
 
+                // Panel descriptivo del modo seleccionado
+                if (_selectedMode != null && _selectedMode != 'old')
+                  _ExtDetailPanel(
+                    ext: _extensions.firstWhere(
+                      (e) => e.id == _selectedMode,
+                      orElse: () => _extensions[4],
+                    ),
+                  ),
+                if (_selectedMode != null && _selectedMode != 'old')
+                  const SizedBox(height: 10),
+
                 Expanded(child: LogPanel(entries: _log)),
               ],
             ),
@@ -192,9 +213,73 @@ class _TabExtensionsState extends State<TabExtensions> {
 
 // ── Datos de extensión ─────────────────────────────────────────────────────
 class _Ext {
-  final String id, icon, label, desc;
+  final String id, icon, label, desc, detail;
+  final List<String> pipeline;
   final Color color;
-  const _Ext(this.id, this.icon, this.label, this.color, this.desc);
+  const _Ext(this.id, this.icon, this.label, this.color, this.desc,
+      this.detail, this.pipeline);
+}
+
+// ── Panel de detalle de extensión seleccionada ────────────────────────────
+class _ExtDetailPanel extends StatelessWidget {
+  final _Ext ext;
+  const _ExtDetailPanel({required this.ext});
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: ext.color.withValues(alpha: 0.07),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: ext.color.withValues(alpha: 0.35)),
+        boxShadow: [BoxShadow(color: ext.color.withValues(alpha: 0.1), blurRadius: 12)],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(children: [
+            Text(ext.icon, style: const TextStyle(fontSize: 14)),
+            const SizedBox(width: 6),
+            Text(
+              '${ext.label} — Cómo funciona',
+              style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: ext.color),
+            ),
+          ]),
+          const SizedBox(height: 6),
+          Text(ext.detail,
+              style: const TextStyle(fontSize: 9, color: kTextDim, height: 1.5)),
+          const SizedBox(height: 8),
+          // Pipeline steps
+          Row(
+            children: ext.pipeline.map((step) => Expanded(
+              child: Container(
+                margin: EdgeInsets.only(right: ext.pipeline.last == step ? 0 : 6),
+                padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+                decoration: BoxDecoration(
+                  color: ext.color.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(4),
+                  border: Border.all(color: ext.color.withValues(alpha: 0.25)),
+                ),
+                child: Text(
+                  step,
+                  style: TextStyle(
+                    fontSize: 7.5, fontWeight: FontWeight.w700,
+                    color: ext.color, fontFamily: 'monospace',
+                  ),
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            )).toList(),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 // ── Tarjeta de modo ────────────────────────────────────────────────────────

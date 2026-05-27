@@ -153,7 +153,7 @@ class _TabLifecycleState extends State<TabLifecycle> {
                   flex: 3,
                   child: ListView.separated(
                     itemCount: _states.length,
-                    separatorBuilder: (_, __) => const _StateArrow(),
+                    separatorBuilder: (_, _) => const _StateArrow(),
                     itemBuilder: (_, i) {
                       final s = _states[i];
                       final isActive = s.state == widget.currentState;

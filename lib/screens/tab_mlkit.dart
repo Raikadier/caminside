@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:google_mlkit_barcode_scanning/google_mlkit_barcode_scanning.dart';
@@ -64,8 +66,19 @@ class _TabMlKitState extends State<TabMlKit> {
 
   void _stopScan() {
     if (!_scanActive) return;
-    _scanActive = false;
     _cam.stopImageStream();
+    // Reset todos los flags ANTES del rebuild
+    _processing   = false;
+    _frameCount   = 0;
+    _lastFpsUpdate = DateTime.now();
+    if (mounted) {
+      setState(() {
+        _scanActive  = false;
+        _fps         = '—';
+        _lastBarcode = null; // oculta la tarjeta de resultado del visor
+      });
+      _addLog('ImageAnalysis pipeline detenido', kRed);
+    }
   }
 
   // ── Procesar frame del stream ─────────────────────────────────────────
@@ -111,11 +124,9 @@ class _TabMlKitState extends State<TabMlKit> {
       if (controller == null) return null;
 
       // Concatenar todos los planos YUV
-      final WriteBuffer allBytes = WriteBuffer();
-      for (final Plane plane in image.planes) {
-        allBytes.putUint8List(plane.bytes);
-      }
-      final bytes = allBytes.done().buffer.asUint8List();
+      final bytes = Uint8List.fromList([
+        for (final Plane plane in image.planes) ...plane.bytes,
+      ]);
 
       final rotation = _sensorRotation(
         controller.description.sensorOrientation,
@@ -160,12 +171,10 @@ class _TabMlKitState extends State<TabMlKit> {
       valor: valor,
       formato: format,
       confianza: 0.97,
-      coordenadas: barcode.boundingBox != null
-          ? {
-              'x': barcode.boundingBox!.left.round(),
-              'y': barcode.boundingBox!.top.round(),
-            }
-          : null,
+      coordenadas: {
+              'x': barcode.boundingBox.left.round(),
+              'y': barcode.boundingBox.top.round(),
+            },
     );
   }
 
@@ -180,6 +189,24 @@ class _TabMlKitState extends State<TabMlKit> {
       case BarcodeType.isbn:    return 'ISBN';
       default:                  return 'QR_CODE';
     }
+  }
+
+  // Renderiza la preview sin deformar el aspect ratio.
+  // previewSize reporta dimensiones en landscape (width = lado largo).
+  // En portrait el móvil rota 90°, así que invertimos width↔height para
+  // que FittedBox.cover escale correctamente sin estirar ni aplastar.
+  Widget _buildPreview() {
+    final ps = _cam.controller!.value.previewSize;
+    if (ps == null) return CameraPreview(_cam.controller!);
+    return FittedBox(
+      fit: BoxFit.cover,
+      clipBehavior: Clip.hardEdge,
+      child: SizedBox(
+        width: ps.height,  // portrait: lado corto → ancho
+        height: ps.width,  // portrait: lado largo → alto
+        child: CameraPreview(_cam.controller!),
+      ),
+    );
   }
 
   @override
@@ -201,11 +228,11 @@ class _TabMlKitState extends State<TabMlKit> {
                 Expanded(
                   flex: 5,
                   child: Stack(
+                    fit: StackFit.expand,
                     children: [
                       ClipRRect(
                         borderRadius: BorderRadius.circular(12),
                         child: Container(
-                          width: double.infinity,
                           decoration: BoxDecoration(
                             border: Border.all(
                               color: _scanActive
@@ -217,7 +244,7 @@ class _TabMlKitState extends State<TabMlKit> {
                           ),
                           child: _cam.initialized &&
                                   _cam.controller!.value.isInitialized
-                              ? CameraPreview(_cam.controller!)
+                              ? _buildPreview()
                               : Container(
                                   color: kBgCard,
                                   child: const Center(

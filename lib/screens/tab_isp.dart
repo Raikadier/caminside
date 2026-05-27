@@ -87,8 +87,8 @@ class _TabIspState extends State<TabIsp> with SingleTickerProviderStateMixin {
     final isRed  = row.isEven && col.isEven;
     final isBlue = row.isOdd  && col.isOdd;
     final v = 60 + math.Random(row * 8 + col).nextInt(80);
-    if (isRed)  return Color.fromARGB(255, wbColor.r, v ~/ 3, v ~/ 3);
-    if (isBlue) return Color.fromARGB(255, v ~/ 3, v ~/ 3, wbColor.b);
+    if (isRed)  return Color.fromARGB(255, wbColor.r.round(), v ~/ 3, v ~/ 3);
+    if (isBlue) return Color.fromARGB(255, v ~/ 3, v ~/ 3, wbColor.b.round());
     return Color.fromARGB(255, v ~/ 3, v, v ~/ 3); // Green
   }
 

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:camera/camera.dart';
 
 import '../services/camera_service.dart';
 import '../services/socket_service.dart';
@@ -108,46 +107,39 @@ class _TabHalState extends State<TabHal> {
           accent: kCyan,
         ),
         Expanded(
-          child: Padding(
+          child: SingleChildScrollView(
             padding: const EdgeInsets.all(12),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Stack de capas
-                Expanded(
-                  flex: 3,
-                  child: ListView.separated(
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: _layers.length,
-                    separatorBuilder: (_, __) => const _LayerConnector(),
-                    itemBuilder: (_, i) => _LayerCard(
-                      layer: _layers[i],
-                      isActive: _layers[i].id == _activeLayer,
-                      onTap: () => _activateLayer(_layers[i].id),
-                    ),
+                // Stack de capas — Column para altura natural (no ListView)
+                for (int i = 0; i < _layers.length; i++) ...[
+                  _LayerCard(
+                    layer: _layers[i],
+                    isActive: _layers[i].id == _activeLayer,
+                    onTap: () => _activateLayer(_layers[i].id),
                   ),
-                ),
+                  if (i < _layers.length - 1) const _LayerConnector(),
+                ],
                 const SizedBox(height: 10),
                 // Panel info de la capa activa
                 _ActiveLayerPanel(layer: activeData),
                 const SizedBox(height: 10),
                 // Botón leer hardware
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton.icon(
-                    onPressed: _readHardware,
-                    icon: const Icon(Icons.memory, size: 16),
-                    label: const Text('LEER CARACTERÍSTICAS HAL'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: kCyan.withValues(alpha: 0.15),
-                      foregroundColor: kCyan,
-                      side: const BorderSide(color: kCyan, width: 1),
-                    ),
+                ElevatedButton.icon(
+                  onPressed: _readHardware,
+                  icon: const Icon(Icons.memory, size: 16),
+                  label: const Text('LEER CARACTERÍSTICAS HAL'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: kCyan.withValues(alpha: 0.15),
+                    foregroundColor: kCyan,
+                    side: const BorderSide(color: kCyan, width: 1),
                   ),
                 ),
                 const SizedBox(height: 10),
                 // Log
-                Expanded(
-                  flex: 2,
+                SizedBox(
+                  height: 130,
                   child: LogPanel(entries: _log.map((e) => LogEntry(e.msg, e.color)).toList()),
                 ),
               ],
