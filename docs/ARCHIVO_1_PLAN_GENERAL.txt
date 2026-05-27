@@ -1,0 +1,76 @@
+================================================================================
+UNIVERSIDAD POPULAR DEL CESAR
+FACULTAD DE INGENIERÍAS Y TECNOLOGÍAS
+DEPARTAMENTO DE INGENIERÍA DE SISTEMAS
+
+PROYECTO: "CAMINSIDE" (v1.0.0)
+DOCUMENTO 1: PLAN GENERAL COMPLETO Y DETALLADO
+MATERIA: PROGRAMACIÓN MÓVIL
+================================================================================
+
+TITULO: ARQUITECTURA MULTICAPA Y FLUJO DE DATOS EN LA CÁMARA MÓVIL
+
+1.1. INTRODUCCIÓN Y JUSTIFICACIÓN
+    El estudio de los sistemas operativos móviles en la ingeniería de sistemas
+    exige comprender cómo el software interactúa de forma asíncrona y eficiente
+    con componentes físicos exclusivos. El proyecto "CamInside" se presenta como
+    un ecosistema de software integrado de extremo a extremo que tiene como fin
+    explicar, diagnosticar y demostrar el funcionamiento interno de la cámara de
+    un smartphone a nivel de software.
+
+    Tradicionalmente, las aplicaciones comerciales ocultan el procesamiento de
+    bajo nivel que ocurre detrás de una captura. Este proyecto rompe esa caja 
+    negra, capturando la telemetría del hardware y los flujos de memoria del 
+    dispositivo real para proyectarlos de manera síncrona en una plataforma 
+    web interactiva durante una exposición académica.
+
+1.2. OBJETIVOS TÉCNICOS DEL PROYECTO
+    * Abstraer la Arquitectura Móvil: Desglosar las capas de software desde la
+      interfaz de usuario hasta la Capa de Abstracción de Hardware (HAL) y los 
+      drivers del Kernel.
+    * Demostrar la Gestión del Ciclo de Vida: Evidenciar la asignación y 
+      liberación de recursos de hardware en respuesta a los estados de la 
+      aplicación (Activity Lifecycle).
+    * Evidenciar Fotografía Computacional y Análisis: Exponer cómo los streams
+      de datos puros en la memoria RAM (formato YUV) pueden ser interceptados 
+      por software para alimentar modelos de Inteligencia Artificial periférica.
+
+1.3. ARQUITECTURA LOGICIAL DEL ECOSISTEMA
+    El sistema se compone de tres piezas de software principales que operan 
+    dentro de una infraestructura de red local (LAN):
+
+    A) CLIENTE MÓVIL (CamInside App): Aplicación nativa desarrollada en Kotlin
+       con Jetpack Compose y la API Jetpack CameraX. Interroga a los managers 
+       del sistema, recupera las características del hardware óptico y emite 
+       eventos de telemetría asíncronos mediante WebSockets.
+
+    B) SERVIDOR DE RETRANSMISIÓN (Middleware): Microservicio ligero desarrollado
+       en Node.js con Express y Socket.io. Escucha en un puerto TCP específico 
+       los paquetes JSON del teléfono y los retransmite instantáneamente a la 
+       interfaz web con una latencia inferior a 15 milisegundos.
+
+    C) VISUALIZADOR WEB (Dashboard): Aplicación web SPA diseñada con Reveal.js,
+       Tailwind CSS y Three.js. Actúa como el lienzo de la presentación, 
+       renderizando animaciones 3D del hardware despiezado y consolas de log 
+       que reaccionan en tiempo real a las acciones del teléfono físico.
+
+1.4. DIAGRAMA DEL PIPELINE DE DATOS
+    [ Sensor Óptico Físico ]
+               │ (Captura de fotones -> Datos analógicos)
+               ▼
+    [ Hardware Abstraction Layer (HAL) & ISP ]
+               │ (Conversión a buffers digitales de memoria RAW/YUV)
+               ▼
+    [ Jetpack CameraX API (Casos de Uso) ]
+               │
+               ├───► [ Preview Surface ] ────► Renderizado local en GPU (Pantalla)
+               ├───► [ Image Capture ]   ────► Guardado de archivo binario (JPEG)
+               └───► [ Image Analysis ]  ────► Hilo Concurrente -> Socket.io Client
+                                                              │
+                                                              ▼ (Red Local LAN)
+                                                    [ Servidor Node.js ]
+                                                              │
+                                                              ▼ (WebSocket)
+                                                    [ Reveal.js Dashboard ]
+                                                    (Animación 3D y Logs en vivo)
+================================================================================

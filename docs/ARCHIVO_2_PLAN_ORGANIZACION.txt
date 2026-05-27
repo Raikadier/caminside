@@ -1,0 +1,79 @@
+================================================================================
+DOCUMENTO 2: PLAN DE ORGANIZACIÓN, DIVISIÓN DE TRABAJO Y PASO A PASO
+PROYECTO: "CAMINSIDE" - INFRAESTRUCTURA TÉCNICA
+================================================================================
+
+TITULO: PLAN DE EJECUCIÓN TÉCNICA Y REPARTO DE CARGAS DE SOFTWARE
+
+2.1. DIVISIÓN DEL TRABAJO (Estructura de Desglose de Trabajo - WBS)
+    Para optimizar el desarrollo entre los 7 integrantes, el grupo se divide 
+    en 3 células funcionales con responsabilidades de código estrictas:
+
+    * CÉLULA MÓVIL (Android Core):
+      - Integrante 3: Configuración del entorno, dependencias de CameraX y UI Base.
+      - Integrante 4: Implementación del Ciclo de Vida y despachador de telemetría.
+      - Integrante 5: Programación del pipeline de captura y manejo de Surfaces.
+
+    * CÉLULA WEB (Frontend Inmersivo):
+      - Integrante 1: Estructura DOM de Reveal.js y enrutamiento lógico de slides.
+      - Integrante 6: Modelado e integración en 3D con Three.js / WebGL.
+
+    * CÉLULA DE INTEGRACIÓN (Backend & AI):
+      - Integrante 2: Configuración del servidor Node.js y lógica de Socket.io.
+      - Integrante 7: Integración del analizador de imágenes con Google ML Kit.
+
+2.2. TECH STACK SELECCIONADO
+    * Móvil: Android SDK Nativo, Lenguaje Kotlin, Jetpack Compose UI, CameraX API.
+    * Servidor: Node.js runtime, Express Framework, Socket.io (WebSockets).
+    * Diapositiva: HTML5, Tailwind CSS, JavaScript Moderno (ES6+), Reveal.js, Three.js.
+
+2.3. PASO A PASO PARA LA CREACIÓN DE LA APLICACIÓN MÓVIL (Célula Móvil)
+    1. Inicializar un proyecto "Empty Compose Activity" en Android Studio.
+    2. Configurar el archivo 'build.gradle.kts' (Module: app) con las dependencias:
+       - androidx.camera:camera-core:1.4.0
+       - androidx.camera:camera-camera2:1.4.0
+       - androidx.camera:camera-lifecycle:1.4.0
+       - androidx.camera:camera-view:1.4.0
+       - io.socket:socket.io-client:2.1.0
+       - com.google.mlkit:barcode-scanning:17.3.0
+    3. Declarar en el 'AndroidManifest.xml' los permisos obligatorios de hardware:
+       <uses-permission android:name="android.permission.CAMERA" />
+       <uses-permission android:name="android.permission.INTERNET" />
+    4. Diseñar la interfaz modular: un componente 'TabRow' controlado por un
+       estado entero (0 al 6) que sirva de enrutador local para las 7 pantallas.
+    5. Pestaña 1 (HAL): Instanciar 'CameraManager' y extraer el mapa de 
+       características 'CameraCharacteristics' para leer el nivel de soporte.
+    6. Pestaña 2 y 3 (ISP/API): Crear un 'PreviewView' dentro de un 'AndroidView'
+       de Compose y enlazar el ciclo de vida mediante 'ProcessCameraProvider'.
+    7. Pestaña 4 (Lifecycle): Sobrescribir los métodos del ciclo de vida de la
+       Activity para emitir strings JSON de log a través del cliente de socket.
+    8. Pestaña 5 y 7 (Analysis): Configurar el caso de uso 'ImageAnalysis' con una 
+       estrategia de descarte de frames 'STRATEGY_KEEP_ONLY_LATEST' para enviar 
+       los buffers de imagen al reconocedor de Google ML Kit en un hilo secundario.
+
+2.4. PASO A PASO PARA LA CREACIÓN DE LA DIAPOSITIVA WEB (Célula Web y Servidor)
+    1. En una carpeta dedicada de Node.js, inicializar el proyecto con 'npm init -y'.
+    2. Instalar dependencias esenciales: 'npm install express socket.io'.
+    3. Desarrollar el archivo 'server.js':
+```javascript
+       const express = require('express');
+       const app = express();
+       const http = require('http').createServer(app);
+       const io = require('socket.io')(http, { cors: { origin: "*" } });
+
+       io.on('connection', (socket) => {
+           console.log('Dispositivo conectado conectado vía WebSocket');
+           socket.on('telemetria_movil', (data) => {
+               io.emit('cambio_diapositiva_web', data); // Retransmisión
+           });
+       });
+       http.listen(3000, () => console.log('Servidor intermedio corriendo en puerto 3000'));
+       ```
+    4. Descargar e inicializar 'Reveal.js' en la carpeta pública del servidor.
+    5. Modificar el archivo 'index.html' añadiendo las secciones correspondientes 
+       a las 7 diapositivas de la exposición.
+    6. Agregar un script de escucha de Socket.io en la cabecera web para interceptar 
+       los datos entrantes y mutar el DOM (actualizar textos de log o mover elementos).
+    7. Inicializar una escena de 'Three.js' en la diapositiva 1 y 2, cargando un 
+       objeto 3D que represente los lentes y sensores ópticos de un smartphone.
+================================================================================

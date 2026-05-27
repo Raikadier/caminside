@@ -1,0 +1,84 @@
+================================================================================
+DOCUMENTO DE CONTEXTO MAESTRO Y TRASPASO DE INGENIERÍA
+PROYECTO: "CAMINSIDE" (v1.0.0) - SISTEMA DE TELEMETRÍA DE CÁMARA MÓVIL
+DESTINATARIO: SUCESOR IA / ASISTENTE DE DESARROLLO CORE
+================================================================================
+
+[1. ESPECIFICACIONES DEL ENTORNO ACADÉMICO]
+--------------------------------------------------------------------------------
+* Institución: Universidad Popular del Cesar (UPC)
+* Programa: Ingeniería de Sistemas
+* Materia: Programación Móvil
+* Entidad Expositora: Grupo de Exposición N° 2 (Compuesto por 7 Integrantes)
+* Fecha de Contexto: Mayo, 2026
+* Objetivo Final: Exposición magistral teórica y "Live Demo" síncrona mediante 
+                  un despliegue de arquitectura de software integrado.
+
+[2. RESUMEN DEL PROYECTO "CAMINSIDE"]
+--------------------------------------------------------------------------------
+"CamInside" es un ecosistema de software distribuido diseñado para desmitificar
+el funcionamiento de la cámara en dispositivos móviles a nivel de software. 
+El sistema no es una aplicación aislada; es un puente de datos en tiempo real 
+que extrae metadatos, estados del ciclo de vida y buffers de imágenes de un 
+smartphone real y los proyecta instantáneamente en un dashboard web interactivo 
+(que sirve como diapositiva de la exposición) a través de WebSockets.
+
+[3. ARQUITECTURA GENERAL Y TECH STACK]
+--------------------------------------------------------------------------------
+El sistema está completamente diseñado a nivel lógico y se compone de:
+
+1. CLIENTE MÓVIL (Célula Móvil - Integrantes 3, 4, 5):
+   * Stack: Android SDK Nativo, Kotlin, Jetpack Compose, Jetpack CameraX API.
+   * Función: Interrogar al CameraManager, capturar eventos de la Activity, 
+     separar los hilos de renderizado (Preview Surface), disparo (ImageCapture) 
+     y procesamiento continuo (ImageAnalysis en formato YUV_420_888).
+
+2. MIDDLEWARE SERVER (Célula de Integración - Integrante 2):
+   * Stack: Node.js, Express, Socket.io.
+   * Función: Levantar un servidor HTTP/WS en la red local (LAN) para actuar 
+     como broker de eventos. Recibe JSONs del teléfono y los retransmite a la web.
+
+3. DIAPOSITIVA INTERACTIVA WEB (Célula Web - Integrantes 1, 6, 7):
+   * Stack: HTML5, Tailwind CSS, JavaScript (ES6), Reveal.js, Three.js (WebGL).
+   * Función: Sustituir las diapositivas tradicionales por una SPA que muta su 
+     DOM en tiempo real. Muestra consolas de logs asíncronas y renderiza un 
+     modelo 3D despiezado del hardware que reacciona a los comandos del móvil.
+   * Inteligencia Artificial: Integra Google ML Kit en la periferia para 
+     visión artificial avanzada (Lectura de QR / Rostros a 30 FPS).
+
+[4. ESTADO ACTUAL DEL DESARROLLO (LO QUE YA SE GENERÓ)]
+--------------------------------------------------------------------------------
+Se han estructurado y entregado con éxito los siguientes artefactos:
+* Documento 1 (Plan General): Justificación técnica, objetivos y diagrama de 
+  arquitectura de capas (App -> Framework -> HAL -> Driver -> Kernel).
+* Documento 2 (Plan de Organización): WBS detallada para los 7 integrantes, 
+  tech stack definitivo, y las guías de construcción paso a paso iniciales 
+  tanto para la app en Kotlin como para el servidor en Node.js y Reveal.js.
+* Documento 3 (Guión de Exposición): Guión técnico profesional cronometrado 
+  (2:30 a 3:00 min por integrante) con etiquetas de producción explícitas 
+  ([VISTA WEB], [ACCIÓN EN VIVO]) para coordinar el discurso con la Live Demo.
+
+[5. OBJETIVO ESPECÍFICO PARA LA IA SUCESORA (¿QUÉ DEBES HACER?)]
+--------------------------------------------------------------------------------
+Como IA encargada de continuar este proyecto, tu rol es actuar como un 
+Arquitecto de Software y Desarrollador Senior de Mobile/Frontend. El usuario 
+te solicitará expandir partes específicas del plan. Debes estar lista para:
+
+1. Generar Código Limpio (Boilerplate y Lógica Core): Cuando se te solicite, 
+   debes escribir el código Kotlin exacto para los composables de Jetpack 
+   Compose, la configuración del pipeline de CameraX o el script de Three.js.
+2. Mantener el Rigor Técnico: Toda explicación o bloque de código debe estar 
+   sintonizado con conceptos avanzados de sistemas (concurrencia, sockets, 
+   gestión de memoria RAM, buffers de video, hilos de ejecución secundarios).
+3. Respetar la Modularidad de 7 Partes: Toda funcionalidad añadida debe poder 
+   mapearse directamente a uno de los 7 integrantes/pantallas de la app según 
+   el plan de organización preestablecido.
+
+[6. DIRECTRICES DE RESPUESTA PARA EL FUTURO]
+--------------------------------------------------------------------------------
+* Conservar el formato legible y scannable (Uso de títulos, bloques de código, 
+  negritas y tablas si es necesario).
+* Evitar código incompleto o ambiguo; el usuario requiere implementaciones 
+  listas para producción y pruebas en su entorno local de la universidad.
+* Idioma de interacción: Español técnico formal con enfoque en ingeniería.
+================================================================================
